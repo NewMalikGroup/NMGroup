@@ -48,23 +48,6 @@
 </tr></thead><tbody id="companyDetailRows"></tbody></table></div>
 </div>
 
-<div class="panel" id="reportPanel"><h2>Daily Dispatch & Back-load Reports</h2>
-<p class="muted">Select a date range and report type. Export the filtered list to CSV (opens in Excel) or print/save as PDF.</p>
-<div class="grid">
-<div><label>From Date</label><input id="repFrom" type="date"></div>
-<div><label>To Date</label><input id="repTo" type="date"></div>
-<div><label>Report Type</label><select id="repType"><option value="all">Outbound + Back-load</option><option value="outbound">Outbound Dispatches</option><option value="backload">Back-loads Only</option></select></div>
-<div><label>Vehicle / Company Search</label><input id="repSearch" placeholder="Vehicle, company, route..."></div>
-</div><br>
-<div class="cards"><div class="card"><small>Records</small><b id="repCount">0</b></div><div class="card"><small>Total Weight</small><b id="repWeight">0 T</b></div><div class="card"><small>Total Freight</small><b id="repFreight">Rs. 0</b></div><div class="card"><small>Pending Receivables</small><b id="repPending">Rs. 0</b></div></div><br>
-<div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-<button class="primary" type="button" onclick="exportReportCSV()">Download Excel CSV</button>
-<button type="button" onclick="printReport()">Print / Save PDF</button>
-<button type="button" onclick="clearReportFilters()">Clear Filters</button>
-</div><br>
-<div class="scroll"><table id="reportTable"><thead><tr><th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Original Trip</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Payment Status</th><th>Received Date</th></tr></thead><tbody id="reportRows"></tbody></table></div>
-</div>
-
 <div class="panel"><h2>Back-Load Dispatch Portal</h2><p class="muted">Separate return-load entries, linked to the original outbound trip where applicable.</p>
 <form id="backForm"><input type="hidden" id="bid"><div class="grid">
 <div><label>Original Trip / Vehicle</label><select id="bOriginal"><option value="">No linked outbound trip</option></select></div><div><label>Back-load Date</label><input id="bDate" type="date" required></div><div><label>Vehicle No.</label><input id="bVehicle" required></div><div><label>Loading Location</label><input id="bOrigin" required></div><div><label>Destination</label><input id="bDestination" value="Karachi" required></div><div><label>Weight (Tons)</label><input id="bWeight" type="number" step=".01" required></div><div><label>Vehicle Capacity (Tons)</label><input id="bCapacity" type="number" value="40" required></div><div><label>Broker / Company</label><input id="bCompany" required></div><div><label>Base Freight</label><input id="bBase" type="number" value="0" required></div><div><label>Extra Weight Rate / Ton</label><input id="bRate" type="number" value="0" required></div><div><label>Payment Terms</label><select id="bTerms"><option>After 10 Days</option><option>On Unloading</option><option>After 15 Days</option><option>Other</option></select></div><div><label>Payment Status</label><select id="bStatus"><option>Pending</option><option>Received</option></select></div><div><label>Received Date</label><input id="bReceived" type="date"></div><div><label>Remarks</label><input id="bRemarks"></div></div>
@@ -161,40 +144,7 @@ async function delBack(id){if(confirm("Delete this back-load record?")){await ap
 $("backForm").onsubmit=async e=>{e.preventDefault();let orig=$("bOriginal").value;let d={original_dispatch_id:orig?+orig:null,date:$("bDate").value,vehicle:$("bVehicle").value.toUpperCase(),origin:$("bOrigin").value,destination:$("bDestination").value,weight:+$("bWeight").value,capacity:+$("bCapacity").value,company:$("bCompany").value,base_freight:+$("bBase").value,extra_rate:+$("bRate").value,payment_terms:$("bTerms").value,payment_status:$("bStatus").value,received_date:$("bReceived").value,remarks:$("bRemarks").value};let id=$("bid").value;await api(id?"/api/backloads/"+id:"/api/backloads",{method:id?"PUT":"POST",body:JSON.stringify(d)});resetBackForm();load()};
 function renderBackloads(){$("backRows").innerHTML=backloads.map(b=>`<tr><td>${b.date}</td><td>${b.original_dispatch_id||"-"} ${b.original_date?"("+b.original_date+")":""}</td><td><b>${b.vehicle}</b></td><td>${b.origin} → ${b.destination}</td><td>${b.weight} T${b.extra_weight>0?"<br><span class='badge p'>+"+b.extra_weight+" T</span>":""}</td><td>${b.company}</td><td>${money(b.base_freight)}</td><td>${money(b.extra_freight)}</td><td><b>${money(b.total_freight)}</b></td><td><span class="badge ${b.payment_status==="Received"?"r":"p"}">${b.payment_status}</span><br><span class=muted>${b.payment_terms}</span></td><td><button onclick='editBack(${JSON.stringify(b)})'>Edit</button> <button class=danger onclick='delBack(${b.id})'>Delete</button></td></tr>`).join("")||"<tr><td colspan=11>No back-load records.</td></tr>";let cur=$("bOriginal").value;$("bOriginal").innerHTML="<option value=''>No linked outbound trip</option>"+data.map(d=>`<option value="${d.id}">#${d.id} — ${d.vehicle} — ${d.origin} to ${d.destination} (${d.date})</option>`).join("");$("bOriginal").value=cur}
 function dashboard(){let today=new Date().toISOString().slice(0,10),tdb=backloads.filter(b=>b.date===today),outTotal=data.reduce((s,r)=>s+Number(r.total_freight||0),0),backTotal=backloads.reduce((s,r)=>s+Number(r.total_freight||0),0),all=[...data,...backloads],pending=all.filter(r=>r.payment_status!=="Received").reduce((s,r)=>s+Number(r.total_freight||0),0),received=all.filter(r=>r.payment_status==="Received").reduce((s,r)=>s+Number(r.total_freight||0),0);$("dbTodayBack").textContent=tdb.length;$("dbOut").textContent=money(outTotal);$("dbBack").textContent=money(backTotal);$("dbCombined").textContent=money(outTotal+backTotal);$("dbPending").textContent=money(pending);$("dbReceived").textContent=money(received);$("dbVehicles").textContent=new Set(all.map(r=>r.vehicle)).size;$("dbBackPending").textContent=money(backloads.filter(r=>r.payment_status!=="Received").reduce((s,r)=>s+Number(r.total_freight||0),0))}
-function getFilteredReportRows(){
- const from=$("repFrom").value,to=$("repTo").value,type=$("repType").value,q=$("repSearch").value.trim().toLowerCase();
- let out=[];
- if(type!=="backload") out.push(...data.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)).map(r=>({type:"Outbound",date:r.date,vehicle:r.vehicle,driverTrip:r.driver,route:`${r.origin} → ${r.destination}`,weight:Number(r.weight||0),company:r.company,freight:Number(r.total_freight||0),status:r.payment_status,received:r.received_date||"",id:r.id})));
- if(type!=="outbound") out.push(...backloads.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)).map(r=>({type:"Back-load",date:r.date,vehicle:r.vehicle,driverTrip:r.original_dispatch_id?`Original trip #${r.original_dispatch_id}`:"-",route:`${r.origin} → ${r.destination}`,weight:Number(r.weight||0),company:r.company,freight:Number(r.total_freight||0),status:r.payment_status,received:r.received_date||"",id:r.id})));
- if(q) out=out.filter(r=>[r.type,r.date,r.vehicle,r.driverTrip,r.route,r.company,r.status].join(" ").toLowerCase().includes(q));
- return out.sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(a.vehicle).localeCompare(String(b.vehicle)));
-}
-function renderReport(){
- const rows=getFilteredReportRows();
- $("repCount").textContent=rows.length;
- $("repWeight").textContent=rows.reduce((s,r)=>s+r.weight,0).toLocaleString("en-PK",{maximumFractionDigits:2})+" T";
- $("repFreight").textContent=money(rows.reduce((s,r)=>s+r.freight,0));
- $("repPending").textContent=money(rows.filter(r=>r.status!=="Received").reduce((s,r)=>s+r.freight,0));
- $("reportRows").innerHTML=rows.map(r=>`<tr><td>${r.type}</td><td>${r.date}</td><td><b>${r.vehicle}</b></td><td>${r.driverTrip}</td><td>${r.route}</td><td>${r.weight} T</td><td>${r.company}</td><td>${money(r.freight)}</td><td><span class="badge ${r.status==="Received"?"r":"p"}">${r.status||"Pending"}</span></td><td>${r.received||"-"}</td></tr>`).join("")||"<tr><td colspan=10 style='text-align:center;padding:22px'>No records match the selected filters.</td></tr>";
-}
-function csvCell(v){const x=String(v??"");return '"'+x.replace(/"/g,'""')+'"'}
-function exportReportCSV(){
- const rows=getFilteredReportRows();
- const headers=["Type","Date","Vehicle","Driver / Original Trip","Route","Weight (Tons)","Company","Freight (PKR)","Payment Status","Received Date"];
- const lines=[headers,...rows.map(r=>[r.type,r.date,r.vehicle,r.driverTrip,r.route,r.weight,r.company,r.freight,r.status,r.received])].map(row=>row.map(csvCell).join(",")).join("\r\n");
- const blob=new Blob(["\ufeff"+lines],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download=`fleet-dispatch-report-${$("repFrom").value||"all"}-to-${$("repTo").value||"all"}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-}
-function printReport(){
- const rows=getFilteredReportRows();
- const from=$("repFrom").value||"All dates",to=$("repTo").value||"All dates",type=$("repType").selectedOptions[0].textContent;
- const html=`<!doctype html><html><head><meta charset="utf-8"><title>Fleet Dispatch Report</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222}h1{font-size:22px}p{font-size:12px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #bbb;padding:6px;text-align:left}th{background:#eee}.summary{margin:14px 0;font-weight:bold}@media print{button{display:none}}</style></head><body><h1>Fleet Dispatch Report</h1><p>Period: ${from} to ${to} | Type: ${type}</p><div class="summary">Records: ${rows.length} | Weight: ${rows.reduce((s,r)=>s+r.weight,0).toLocaleString("en-PK",{maximumFractionDigits:2})} T | Total Freight: ${money(rows.reduce((s,r)=>s+r.freight,0))} | Pending: ${money(rows.filter(r=>r.status!=="Received").reduce((s,r)=>s+r.freight,0))}</div><table><thead><tr><th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Trip</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Status</th><th>Received Date</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.type}</td><td>${r.date}</td><td>${r.vehicle}</td><td>${r.driverTrip}</td><td>${r.route}</td><td>${r.weight} T</td><td>${r.company}</td><td>${money(r.freight)}</td><td>${r.status}</td><td>${r.received||"-"}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;
- const w=window.open("","_blank");if(!w){alert("Please allow pop-ups for this portal to print or save as PDF.");return}w.document.open();w.document.write(html);w.document.close();
-}
-function clearReportFilters(){$("repFrom").value="";$("repTo").value="";$ ("repType").value="all";$ ("repSearch").value="";renderReport()}
-["repFrom","repTo","repType","repSearch"].forEach(id=>$(id).addEventListener("input",renderReport));
-
-async function load(){data=await api("/api/dispatches");backloads=await api("/api/backloads");updateCompanyOptions();render();renderBackloads();dashboard();report();pendingReport();renderReport()}
+async function load(){data=await api("/api/dispatches");backloads=await api("/api/backloads");updateCompanyOptions();render();renderBackloads();dashboard();report();pendingReport()}
 $("search").oninput=render;["rv","rf","rt"].forEach(x=>$(x).oninput=report);
 ["pc","pf","pt"].forEach(x=>$(x).oninput=pendingReport);
 if(token)show();else {calc();calcBack()}
