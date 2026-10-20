@@ -10,8 +10,5 @@
     "better-sqlite3": "^12.9.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2"
-  },
-  "allowScripts": {
-    "better-sqlite3@12.11.1": true
   }
 }
