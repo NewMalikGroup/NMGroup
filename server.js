@@ -57,6 +57,8 @@ CREATE TABLE IF NOT EXISTS backloads(
  payment_terms TEXT NOT NULL,
  payment_status TEXT NOT NULL DEFAULT 'Pending',
  received_date TEXT,
+ completed INTEGER NOT NULL DEFAULT 0,
+ completion_date TEXT,
  remarks TEXT,
  created_by INTEGER,
  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -65,6 +67,8 @@ CREATE TABLE IF NOT EXISTS backloads(
 `);
 
 try{db.exec("ALTER TABLE backloads ADD COLUMN capacity REAL NOT NULL DEFAULT 40");}catch(e){}
+try{db.exec("ALTER TABLE backloads ADD COLUMN completed INTEGER NOT NULL DEFAULT 0");}catch(e){}
+try{db.exec("ALTER TABLE backloads ADD COLUMN completion_date TEXT");}catch(e){}
 
 if(!db.prepare("SELECT 1 FROM users LIMIT 1").get()){
   const hash=bcrypt.hashSync("admin123",10);
@@ -125,15 +129,15 @@ app.get("/api/backloads",auth,(req,res)=>{
 app.post("/api/backloads",auth,(req,res)=>{
  const d=req.body, extra=Math.max(0,Number(d.weight||0)-Number(d.capacity||0));
  const extraFreight=extra*Number(d.extra_rate||0), total=Number(d.base_freight||0)+extraFreight;
- const r=db.prepare(`INSERT INTO backloads(original_dispatch_id,date,vehicle,origin,destination,weight,capacity,company,base_freight,extra_rate,extra_weight,extra_freight,total_freight,payment_terms,payment_status,received_date,remarks,created_by)
- VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(d.original_dispatch_id||null,d.date,d.vehicle,d.origin,d.destination,d.weight,d.capacity||40,d.company,d.base_freight||0,d.extra_rate||0,extra,extraFreight,total,d.payment_terms||"After 10 Days",d.payment_status||"Pending",d.received_date||null,d.remarks||"",req.user.id);
+ const r=db.prepare(`INSERT INTO backloads(original_dispatch_id,date,vehicle,origin,destination,weight,capacity,company,base_freight,extra_rate,extra_weight,extra_freight,total_freight,payment_terms,payment_status,received_date,completed,completion_date,remarks,created_by)
+ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(d.original_dispatch_id||null,d.date,d.vehicle,d.origin,d.destination,d.weight,d.capacity||40,d.company,d.base_freight||0,d.extra_rate||0,extra,extraFreight,total,d.payment_terms||"After 10 Days",d.payment_status||"Pending",d.received_date||null,d.completed?1:0,d.completion_date||null,d.remarks||"",req.user.id);
  res.json({id:r.lastInsertRowid});
 });
 app.put("/api/backloads/:id",auth,(req,res)=>{
  const d=req.body, extra=Math.max(0,Number(d.weight||0)-Number(d.capacity||0));
  const extraFreight=extra*Number(d.extra_rate||0), total=Number(d.base_freight||0)+extraFreight;
- db.prepare(`UPDATE backloads SET original_dispatch_id=?,date=?,vehicle=?,origin=?,destination=?,weight=?,capacity=?,company=?,base_freight=?,extra_rate=?,extra_weight=?,extra_freight=?,total_freight=?,payment_terms=?,payment_status=?,received_date=?,remarks=? WHERE id=?`)
- .run(d.original_dispatch_id||null,d.date,d.vehicle,d.origin,d.destination,d.weight,d.capacity||40,d.company,d.base_freight||0,d.extra_rate||0,extra,extraFreight,total,d.payment_terms||"After 10 Days",d.payment_status||"Pending",d.received_date||null,d.remarks||"",req.params.id);
+ db.prepare(`UPDATE backloads SET original_dispatch_id=?,date=?,vehicle=?,origin=?,destination=?,weight=?,capacity=?,company=?,base_freight=?,extra_rate=?,extra_weight=?,extra_freight=?,total_freight=?,payment_terms=?,payment_status=?,received_date=?,completed=?,completion_date=?,remarks=? WHERE id=?`)
+ .run(d.original_dispatch_id||null,d.date,d.vehicle,d.origin,d.destination,d.weight,d.capacity||40,d.company,d.base_freight||0,d.extra_rate||0,extra,extraFreight,total,d.payment_terms||"After 10 Days",d.payment_status||"Pending",d.received_date||null,d.completed?1:0,d.completion_date||null,d.remarks||"",req.params.id);
  res.json({ok:true});
 });
 app.delete("/api/backloads/:id",auth,(req,res)=>{db.prepare("DELETE FROM backloads WHERE id=?").run(req.params.id);res.json({ok:true})});
