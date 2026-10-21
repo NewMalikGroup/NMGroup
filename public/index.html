@@ -3,7 +3,7 @@
 <title>Fleet Dispatch Portal</title><style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f4f6f8;color:#18222d}header{background:#17202a;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}main{max-width:1250px;margin:18px auto;padding:0 14px}.panel{background:#fff;padding:18px;border-radius:10px;margin-bottom:16px;box-shadow:0 2px 8px #0001}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}label{font-size:12px;font-weight:bold;display:block;margin-bottom:5px}input,select,button{width:100%;padding:10px;border:1px solid #ccd3d9;border-radius:6px}button{cursor:pointer;font-weight:bold}.primary{background:#1769e0;color:#fff;border:0}.danger{background:#d92d20;color:#fff;border:0}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{padding:14px;background:#fff;border-radius:9px;box-shadow:0 2px 8px #0001}.card small{color:#68737d}.card b{display:block;font-size:23px;margin-top:5px}table{width:100%;border-collapse:collapse;min-width:1050px}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13px}th{background:#f7f8fa}.scroll{overflow:auto}.badge{padding:4px 7px;border-radius:20px;font-size:11px}.clickable{cursor:pointer}.clickable:hover{background:#f0f5ff}.p{background:#fff0d5;color:#815400}.r{background:#dff6e5;color:#176b2c}.login{max-width:380px;margin:70px auto}.hidden{display:none}.muted{font-size:12px;color:#66717b}@media(max-width:800px){.grid,.cards{grid-template-columns:1fr 1fr}}@media(max-width:520px){.grid,.cards{grid-template-columns:1fr}}
 </style></head><body>
-<div id="login" class="login panel"><h2>Fleet Portal Login</h2><label>Username</label><input id="lu" value="admin"><label style="margin-top:10px">Password</label><input id="lp" type="password" value="admin123"><button class="primary" style="margin-top:12px" onclick="login()">Login</button><p id="le" class="muted"></p></div>
+<div id="login" class="login panel"><h2>Fleet Portal Login</h2><label>Username</label><input id="lu" value="admin"><label style="margin-top:10px">Password</label><input id="lp" type="password" autocomplete="current-password"><button class="primary" style="margin-top:12px" onclick="login()">Login</button><p id="le" class="muted"></p></div>
 <div id="app" class="hidden"><header><b>Fleet Dispatch Portal</b><button style="width:auto;background:#fff" onclick="logout()">Logout</button></header><main>
 <div class="cards"><div class="card"><small>Today's Trips</small><b id="tr">0</b></div><div class="card"><small>Today's Weight</small><b id="tw">0 T</b></div><div class="card"><small>Today's Freight</small><b id="tf">Rs. 0</b></div><div class="card"><small>Today's Pending</small><b id="tp">Rs. 0</b></div></div>
 <div class="panel"><h2>Management Dashboard</h2><div class="cards">
@@ -16,16 +16,7 @@
 <div><label>Received Date</label><input id="received" type="date"></div><div><label>Remarks</label><input id="remarks"></div></div>
 <p class="muted">Extra weight: <b id="ex">0 T</b> &nbsp; | &nbsp; Extra freight: <b id="ef">Rs. 0</b> &nbsp; | &nbsp; Total freight: <b id="tot">Rs. 0</b></p>
 <button class="primary" type="submit">Save Dispatch</button> <button type="button" onclick="resetForm()">Clear</button></form></div>
-<div class="panel"><h2>Vehicle-wise Trip Report</h2><div class="grid"><div><label>Vehicle</label><select id="rv"><option value="">All Vehicles</option></select></div><div><label>From</label><input id="rf" type="date"></div><div><label>To</label><input id="rt" type="date"></div></div><br><div class="cards"><div class="card"><small>Trips</small><b id="rr1">0</b></div><div class="card"><small>Weight</small><b id="rr2">0 T</b></div><div class="card"><small>Freight</small><b id="rr3">Rs. 0</b></div><div class="card"><small>Pending</small><b id="rr4">Rs. 0</b></div><div class="card"><small>Received</small><b id="rr5">Rs. 0</b></div></div><br><div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><button class="primary" type="button" onclick="exportVehicleReportCSV()">Download Vehicle CSV</button><button type="button" onclick="printVehicleReport()">Print / Save PDF</button></div><br><div class="scroll"><table><thead><tr><th>Type</th><th>Date</th><th>Vehicle</th><th>Broker / Company</th><th>Route</th><th>Freight</th><th>Linked Trip Combined Potential</th><th>Payment Status</th><th>Received Date</th></tr></thead><tbody id="vehicleReportRows"></tbody></table></div></div>
-
-<div class="panel" id="monthlyIncomePanel"><h2>Monthly Vehicle Income Report</h2>
-<p class="muted">Recognized freight income is counted when a linked back-load is marked Completed. For a linked trip cycle, this includes the original outbound freight plus back-load freight, assuming the original freight will be received. This is expected/earned freight, not proof of cash receipt.</p>
-<div class="grid"><div><label>Month</label><input id="incomeMonth" type="month"></div><div><label>Vehicle</label><select id="incomeVehicle"><option value="">All Vehicles</option></select></div></div><br>
-<div class="cards"><div class="card"><small>Vehicles</small><b id="miVehicles">0</b></div><div class="card"><small>Completed Income Cycles</small><b id="miCycles">0</b></div><div class="card"><small>Recognized Income</small><b id="miIncome">Rs. 0</b></div><div class="card"><small>Potential Not Yet Recognized</small><b id="miPotential">Rs. 0</b></div></div><br>
-<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><button class="primary" type="button" onclick="exportMonthlyIncomeCSV()">Download Monthly Income CSV</button><button type="button" onclick="printMonthlyIncome()">Print / Save PDF</button></div><br>
-<div class="scroll"><table><thead><tr><th>Vehicle</th><th>Income Cycles</th><th>Completed Cycles</th><th>Recognized Income</th><th>Potential Pending Completion</th></tr></thead><tbody id="monthlyIncomeRows"></tbody></table></div>
-<div class="scroll" style="margin-top:16px"><table><thead><tr><th>Cycle / Trip</th><th>Recognition Date</th><th>Vehicle</th><th>Outbound Freight</th><th>Back-load Freight</th><th>Combined Potential</th><th>Status</th><th>Income Counted</th></tr></thead><tbody id="monthlyIncomeDetails"></tbody></table></div>
-</div>
+<div class="panel"><h2>Vehicle-wise Trip Report</h2><div class="grid"><div><label>Vehicle</label><select id="rv"><option value="">All Vehicles</option></select></div><div><label>From</label><input id="rf" type="date"></div><div><label>To</label><input id="rt" type="date"></div></div><br><div class="cards"><div class="card"><small>Trips</small><b id="rr1">0</b></div><div class="card"><small>Weight</small><b id="rr2">0 T</b></div><div class="card"><small>Freight</small><b id="rr3">Rs. 0</b></div><div class="card"><small>Pending</small><b id="rr4">Rs. 0</b></div></div></div>
 
 <div class="panel"><h2>Broker / Company-wise Pending Payments</h2>
 <div class="grid">
@@ -39,14 +30,13 @@
 <div class="card"><small>Total Freight</small><b id="pr3">Rs. 0</b></div>
 <div class="card"><small>Pending Amount</small><b id="pr4">Rs. 0</b></div>
 </div><br>
-<div class="scroll"><table><thead><tr><th>Broker / Company</th><th>Pending Trips</th><th>Total Freight</th><th>Received</th><th>Pending</th><th>Payment Terms</th></tr></thead>
+<div class="scroll"><table><thead><tr><th>S.No.</th><th>Broker / Company</th><th>Pending Trips</th><th>Total Freight</th><th>Received</th><th>Pending</th><th>Payment Terms</th></tr></thead>
 <tbody id="pendingRows"></tbody></table></div>
 <p class="muted">Tip: Click a company row to view its pending trip details.</p>
 </div>
 
 <div id="companyDetailPanel" class="panel hidden">
 <h2 id="companyDetailTitle">Pending Trip Details</h2>
-<button class="primary" type="button" onclick="printPendingBill()" style="max-width:300px;margin:0 0 14px">Generate / Print Pending Freight Bill</button>
 <div class="cards">
 <div class="card"><small>Pending Trips</small><b id="cd1">0</b></div>
 <div class="card"><small>Pending Weight</small><b id="cd2">0 T</b></div>
@@ -54,7 +44,7 @@
 <div class="card"><small>Oldest Pending Date</small><b id="cd4">-</b></div>
 </div><br>
 <div class="scroll"><table><thead><tr>
-<th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Original Trip</th><th>Route</th><th>Weight</th><th>Freight</th><th>Payment Terms</th><th>Action</th>
+<th>S.No.</th><th>Date</th><th>Vehicle</th><th>Driver</th><th>Route</th><th>Weight</th><th>Freight</th><th>Payment Terms</th><th>Action</th>
 </tr></thead><tbody id="companyDetailRows"></tbody></table></div>
 </div>
 
@@ -72,15 +62,15 @@
 <button type="button" onclick="printReport()">Print / Save PDF</button>
 <button type="button" onclick="clearReportFilters()">Clear Filters</button>
 </div><br>
-<div class="scroll"><table id="reportTable"><thead><tr><th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Original Trip</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Payment Status</th><th>Received Date</th></tr></thead><tbody id="reportRows"></tbody></table></div>
+<div class="scroll"><table id="reportTable"><thead><tr><th>S.No.</th><th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Original Trip</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Payment Status</th><th>Received Date</th></tr></thead><tbody id="reportRows"></tbody></table></div>
 </div>
 
 <div class="panel"><h2>Back-Load Dispatch Portal</h2><p class="muted">Separate return-load entries, linked to the original outbound trip where applicable.</p>
 <form id="backForm"><input type="hidden" id="bid"><div class="grid">
-<div><label>Original Trip / Vehicle</label><select id="bOriginal"><option value="">No linked outbound trip</option></select></div><div><label>Back-load Date</label><input id="bDate" type="date" required></div><div><label>Vehicle No.</label><input id="bVehicle" required></div><div><label>Loading Location</label><input id="bOrigin" required></div><div><label>Destination</label><input id="bDestination" value="Karachi" required></div><div><label>Weight (Tons)</label><input id="bWeight" type="number" step=".01" required></div><div><label>Vehicle Capacity (Tons)</label><input id="bCapacity" type="number" value="40" required></div><div><label>Broker / Company</label><input id="bCompany" required></div><div><label>Base Freight</label><input id="bBase" type="number" value="0" required></div><div><label>Extra Weight Rate / Ton</label><input id="bRate" type="number" value="0" required></div><div><label>Payment Terms</label><select id="bTerms"><option>After 10 Days</option><option>On Unloading</option><option>After 15 Days</option><option>Other</option></select></div><div><label>Payment Status</label><select id="bStatus"><option>Pending</option><option>Received</option></select></div><div><label>Payment Received Date</label><input id="bReceived" type="date"></div><div><label>Back-load Completed?</label><select id="bCompleted"><option value="0">Not Completed</option><option value="1">Completed</option></select></div><div><label>Completion Date</label><input id="bCompletionDate" type="date"></div><div><label>Remarks</label><input id="bRemarks"></div></div>
+<div><label>Original Trip / Vehicle</label><select id="bOriginal"><option value="">No linked outbound trip</option></select></div><div><label>Back-load Date</label><input id="bDate" type="date" required></div><div><label>Vehicle No.</label><input id="bVehicle" required></div><div><label>Loading Location</label><input id="bOrigin" required></div><div><label>Destination</label><input id="bDestination" value="Karachi" required></div><div><label>Weight (Tons)</label><input id="bWeight" type="number" step=".01" required></div><div><label>Vehicle Capacity (Tons)</label><input id="bCapacity" type="number" value="40" required></div><div><label>Broker / Company</label><input id="bCompany" required></div><div><label>Base Freight</label><input id="bBase" type="number" value="0" required></div><div><label>Extra Weight Rate / Ton</label><input id="bRate" type="number" value="0" required></div><div><label>Payment Terms</label><select id="bTerms"><option>After 10 Days</option><option>On Unloading</option><option>After 15 Days</option><option>Other</option></select></div><div><label>Payment Status</label><select id="bStatus"><option>Pending</option><option>Received</option></select></div><div><label>Received Date</label><input id="bReceived" type="date"></div><div><label>Remarks</label><input id="bRemarks"></div></div>
 <p class="muted">Extra weight: <b id="bExtra">0 T</b> | Extra freight: <b id="bExtraFreight">Rs. 0</b> | Total back-load freight: <b id="bTotal">Rs. 0</b></p><button class="primary" type="submit">Save Back-load</button> <button type="button" onclick="resetBackForm()">Clear</button></form></div>
-<div class="panel"><h2>Back-load Records</h2><div class="scroll"><table><thead><tr><th>Date</th><th>Original Trip</th><th>Vehicle</th><th>Route</th><th>Weight</th><th>Broker / Company</th><th>Base</th><th>Extra Freight</th><th>Total</th><th>Payment</th><th>Trip Completion</th><th>Action</th></tr></thead><tbody id="backRows"></tbody></table></div></div>
-<div class="panel"><h2>Dispatch Records</h2><input id="search" placeholder="Search vehicle, driver, company, destination..."><br><br><div class="scroll"><table><thead><tr><th>Date</th><th>Vehicle</th><th>Driver</th><th>Route</th><th>Weight</th><th>Company</th><th>Outbound Freight</th><th>Linked Back-load / Combined Freight</th><th>Payment</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div></div>
+<div class="panel"><h2>Back-load Records</h2><div class="scroll"><table><thead><tr><th>S.No.</th><th>Date</th><th>Original Trip</th><th>Vehicle</th><th>Route</th><th>Weight</th><th>Broker / Company</th><th>Base</th><th>Extra Freight</th><th>Total</th><th>Payment</th><th>Action</th></tr></thead><tbody id="backRows"></tbody></table></div></div>
+<div class="panel"><h2>Dispatch Records</h2><input id="search" placeholder="Search vehicle, driver, company, destination..."><br><br><div class="scroll"><table><thead><tr><th>S.No.</th><th>Date</th><th>Vehicle</th><th>Driver</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Payment</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div></div>
 </main></div>
 <script>
 let token=localStorage.getItem("fleetToken"), data=[], backloads=[];
@@ -95,50 +85,62 @@ $("form").onsubmit=async e=>{e.preventDefault();let d={date:$("date").value,vehi
 function resetForm(){$("form").reset();$("id").value="";$("date").value=new Date().toISOString().slice(0,10);$("origin").value="Karachi";$("capacity").value="40";$("ft").textContent="Add Dispatch";calc()}
 function edit(r){for(let [k,v] of Object.entries({id:r.id,date:r.date,vehicle:r.vehicle,capacity:r.capacity,driver:r.driver,origin:r.origin,destination:r.destination,weight:r.weight,company:r.company,base:r.base_freight,rate:r.extra_rate,terms:r.payment_terms,status:r.payment_status,received:r.received_date||"",remarks:r.remarks||""}))$(k).value=v;$("ft").textContent="Edit Dispatch";calc();scrollTo(0,0)}
 async function del(id){if(confirm("Delete this record?")){await api("/api/dispatches/"+id,{method:"DELETE"});load()}}
-function linkedBackloadSummary(r){const bs=backloads.filter(b=>Number(b.original_dispatch_id)===Number(r.id));if(!bs.length)return "<span class=muted>No linked back-load</span>";const backTotal=bs.reduce((s,b)=>s+Number(b.total_freight||0),0),combined=Number(r.total_freight||0)+backTotal;return bs.map(b=>`${b.date}: ${b.origin} → ${b.destination} — ${money(b.total_freight)} <span class="badge ${b.completed?"r":"p"}">${b.completed?"Completed":"In progress"}</span>`).join("<br>")+`<br><b>Combined trip-cycle freight: ${money(combined)}</b>`}
-function render(){let q=$("search").value.toLowerCase(),rows=data.filter(r=>[r.vehicle,r.driver,r.company,r.destination,r.origin].join(" ").toLowerCase().includes(q));$("rows").innerHTML=rows.map(r=>`<tr><td>${r.date}</td><td><b>${r.vehicle}</b><br><span class=muted>${r.capacity} T</span></td><td>${r.driver}</td><td>${r.origin} → ${r.destination}</td><td>${r.weight} T${r.extra_weight>0?"<br><span class='badge p'>+"+r.extra_weight+" T</span>":""}</td><td>${r.company}</td><td><b>${money(r.total_freight)}</b></td><td>${linkedBackloadSummary(r)}</td><td><span class="badge ${r.payment_status==="Received"?"r":"p"}">${r.payment_status}</span><br><span class=muted>${r.payment_terms}</span></td><td><button onclick='edit(${JSON.stringify(r)})'>Edit</button> <button class=danger onclick='del(${r.id})'>Delete</button></td></tr>`).join("")||"<tr><td colspan=10>No records.</td></tr>";let t=new Date().toISOString().slice(0,10),d=data.filter(r=>r.date===t);$("tr").textContent=d.length;$("tw").textContent=d.reduce((a,r)=>a+r.weight,0)+" T";$("tf").textContent=money(d.reduce((a,r)=>a+r.total_freight,0));$("tp").textContent=money(d.filter(r=>r.payment_status!=="Received").reduce((a,r)=>a+r.total_freight,0));let vs=[...new Set(data.map(r=>r.vehicle))].sort(),cur=$("rv").value;$("rv").innerHTML="<option value=''>All Vehicles</option>"+vs.map(v=>`<option>${v}</option>`).join("");$("rv").value=vs.includes(cur)?cur:""}
-function allTransactions(){
- const outbound=data.map(r=>({...r,recordType:"Outbound",recordId:r.id,reportDate:r.date,reportFreight:Number(r.total_freight||0),reportCompany:r.company,reportVehicle:r.vehicle,reportStatus:r.payment_status||"Pending",reportTerms:r.payment_terms||"",reportRoute:`${r.origin} → ${r.destination}`,reportWeight:Number(r.weight||0),reportDriver:r.driver||"",originalTripId:r.id}));
- const backs=backloads.map(r=>({...r,recordType:"Back-load",recordId:r.id,reportDate:r.date,reportFreight:Number(r.total_freight||0),reportCompany:r.company,reportVehicle:r.vehicle,reportStatus:r.payment_status||"Pending",reportTerms:r.payment_terms||"",reportRoute:`${r.origin} → ${r.destination}`,reportWeight:Number(r.weight||0),reportDriver:r.original_dispatch_id?`Original trip #${r.original_dispatch_id}`:"-",originalTripId:r.original_dispatch_id||null}));
- return [...outbound,...backs];
-}
+function render(){let q=$("search").value.toLowerCase(),rows=data.filter(r=>[r.vehicle,r.driver,r.company,r.destination,r.origin].join(" ").toLowerCase().includes(q));$("rows").innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.date}</td><td><b>${r.vehicle}</b><br><span class=muted>${r.capacity} T</span></td><td>${r.driver}</td><td>${r.origin} → ${r.destination}</td><td>${r.weight} T${r.extra_weight>0?"<br><span class='badge p'>+"+r.extra_weight+" T</span>":""}</td><td>${r.company}</td><td><b>${money(r.total_freight)}</b></td><td><span class="badge ${r.payment_status==="Received"?"r":"p"}">${r.payment_status}</span><br><span class=muted>${r.payment_terms}</span></td><td><button onclick='edit(${JSON.stringify(r)})'>Edit</button> <button class=danger onclick='del(${r.id})'>Delete</button></td></tr>`).join("")||"<tr><td colspan=10>No records.</td></tr>";let t=new Date().toISOString().slice(0,10),d=data.filter(r=>r.date===t);$("tr").textContent=d.length;$("tw").textContent=d.reduce((a,r)=>a+r.weight,0)+" T";$("tf").textContent=money(d.reduce((a,r)=>a+r.total_freight,0));$("tp").textContent=money(d.filter(r=>r.payment_status!=="Received").reduce((a,r)=>a+r.total_freight,0));let vs=[...new Set(data.map(r=>r.vehicle))].sort(),cur=$("rv").value;$("rv").innerHTML="<option value=''>All Vehicles</option>"+vs.map(v=>`<option>${v}</option>`).join("");$("rv").value=vs.includes(cur)?cur:""}
 function pendingReport(){
- const company=$("pc").value,from=$("pf").value,to=$("pt").value;
- const d=allTransactions().filter(r=>(!company||r.reportCompany===company)&&(!from||r.reportDate>=from)&&(!to||r.reportDate<=to));
- const groups={};
- d.forEach(r=>{const name=r.reportCompany||"(No company)";if(!groups[name])groups[name]={trips:0,total:0,received:0,pending:0,terms:{}};const g=groups[name];g.total+=r.reportFreight;if(r.reportStatus==="Received")g.received+=r.reportFreight;else{g.trips++;g.pending+=r.reportFreight}g.terms[r.reportTerms]=(g.terms[r.reportTerms]||0)+1;});
- const arr=Object.entries(groups).map(([name,g])=>({name,...g})).sort((a,b)=>b.pending-a.pending);
- $("pr1").textContent=arr.length;$("pr2").textContent=arr.reduce((a,g)=>a+g.trips,0);$("pr3").textContent=money(arr.reduce((a,g)=>a+g.total,0));$("pr4").textContent=money(arr.reduce((a,g)=>a+g.pending,0));
- $("pendingRows").innerHTML=arr.length?arr.map(g=>`<tr class="clickable" title="Click to view payment details" onclick='showCompanyDetails(${JSON.stringify(g.name)})'><td><b>${g.name}</b></td><td>${g.trips}</td><td>${money(g.total)}</td><td>${money(g.received)}</td><td><b>${money(g.pending)}</b></td><td>${Object.entries(g.terms).map(([k,v])=>k+" ("+v+")").join(", ")}</td></tr>`).join(""):"<tr><td colspan=6 style='text-align:center;padding:25px'>No payment records found.</td></tr>";
- if(company)showCompanyDetails(company,false);else hideCompanyDetails();
+ let company=$("pc").value,from=$("pf").value,to=$("pt").value;
+ let d=data.filter(r=>(!company||r.company===company)&&(!from||r.date>=from)&&(!to||r.date<=to));
+ let groups={};
+ d.forEach(r=>{
+   if(!groups[r.company]) groups[r.company]={trips:0,total:0,received:0,pending:0,terms:{}};
+   let g=groups[r.company]; g.total+=Number(r.total_freight||0);
+   if(r.payment_status==="Received") g.received+=Number(r.total_freight||0);
+   else {g.trips++;g.pending+=Number(r.total_freight||0)}
+   g.terms[r.payment_terms]=(g.terms[r.payment_terms]||0)+1;
+ });
+ let arr=Object.entries(groups).map(([name,g])=>({name,...g})).sort((a,b)=>b.pending-a.pending);
+ $("pr1").textContent=arr.length;
+ $("pr2").textContent=arr.reduce((a,g)=>a+g.trips,0);
+ $("pr3").textContent=money(arr.reduce((a,g)=>a+g.total,0));
+ $("pr4").textContent=money(arr.reduce((a,g)=>a+g.pending,0));
+ $("pendingRows").innerHTML=arr.length?arr.map((g,i)=>`<tr class="clickable" title="Click to view pending trip details" onclick='showCompanyDetails(${JSON.stringify(g.name)})'><td>${i+1}</td><td><b>${g.name}</b></td><td>${g.trips}</td><td>${money(g.total)}</td><td>${money(g.received)}</td><td><b>${money(g.pending)}</b></td><td>${Object.entries(g.terms).map(([k,v])=>k+" ("+v+")").join(", ")}</td></tr>`).join(""):"<tr><td colspan=7 style='text-align:center;padding:25px'>No payment records found.</td></tr>";
+ if(company) showCompanyDetails(company); else hideCompanyDetails();
 }
-function showCompanyDetails(company,scroll=true){
- const from=$("pf").value,to=$("pt").value;
- const d=allTransactions().filter(r=>r.reportCompany===company&&r.reportStatus!=="Received"&&(!from||r.reportDate>=from)&&(!to||r.reportDate<=to)).sort((a,b)=>String(a.reportDate).localeCompare(String(b.reportDate)));
- $("companyDetailTitle").textContent="Pending Freight Details — "+company;
- $("cd1").textContent=d.length;$("cd2").textContent=d.reduce((a,r)=>a+r.reportWeight,0)+" T";$("cd3").textContent=money(d.reduce((a,r)=>a+r.reportFreight,0));$("cd4").textContent=d.length?d[0].reportDate:"-";
- $("companyDetailRows").innerHTML=d.length?d.map(r=>`<tr><td>${r.recordType}</td><td>${r.reportDate}</td><td><b>${r.reportVehicle}</b></td><td>${r.reportDriver||"-"}</td><td>${r.reportRoute}</td><td>${r.reportWeight} T</td><td><b>${money(r.reportFreight)}</b></td><td>${r.reportTerms}</td><td><button class="btn" onclick="event.stopPropagation(); markReceived('${r.recordType}',${r.recordId})">Mark Received</button></td></tr>`).join(""):"<tr><td colspan=9 style='text-align:center;padding:25px'>No pending trips found for this company.</td></tr>";
- $("companyDetailPanel").classList.remove("hidden");if(scroll)$("companyDetailPanel").scrollIntoView({behavior:"smooth",block:"start"});
+
+function showCompanyDetails(company){
+ let from=$("pf").value,to=$("pt").value;
+ let d=data.filter(r=>r.company===company && r.payment_status!=="Received" && (!from||r.date>=from) && (!to||r.date<=to))
+          .sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ $("companyDetailTitle").textContent="Pending Trip Details — "+company;
+ $("cd1").textContent=d.length;
+ $("cd2").textContent=d.reduce((a,r)=>a+Number(r.weight||0),0)+" T";
+ $("cd3").textContent=money(d.reduce((a,r)=>a+Number(r.total_freight||0),0));
+ $("cd4").textContent=d.length?d[0].date:"-";
+ $("companyDetailRows").innerHTML=d.length?d.map((r,i)=>`<tr><td>${i+1}</td><td>${r.date}</td><td><b>${r.vehicle}</b><br><span class=muted>${r.capacity} T capacity</span></td><td>${r.driver}</td><td>${r.origin} → ${r.destination}</td><td>${r.weight} T${r.extra_weight>0?"<br><span class='badge p'>+"+r.extra_weight+" T</span>":""}</td><td><b>${money(r.total_freight)}</b></td><td>${r.payment_terms}</td><td><button class="btn" onclick="event.stopPropagation(); markReceived(${r.id})">Mark Received</button></td></tr>`).join(""):"<tr><td colspan=9 style='text-align:center;padding:25px'>No pending trips found for this company.</td></tr>";
+ $("companyDetailPanel").classList.remove("hidden");
+ $("companyDetailPanel").scrollIntoView({behavior:"smooth",block:"start"});
 }
-function printPendingBill(){
- const company=$("pc").value||($("companyDetailTitle").textContent.split("—").slice(1).join("—").trim());
- if(!company||company==="Pending Freight Details") {alert("Please select a company in the company-wise report first.");return;}
- const from=$("pf").value,to=$("pt").value;
- const rows=allTransactions().filter(r=>r.reportCompany===company&&r.reportStatus!=="Received"&&(!from||r.reportDate>=from)&&(!to||r.reportDate<=to)).sort((a,b)=>String(a.reportDate).localeCompare(String(b.reportDate)));
- if(!rows.length){alert("This company has no pending freight in the selected date range.");return;}
- const invoiceNo="FP-"+new Date().toISOString().slice(0,10).replace(/-/g,"")+"-"+String(Date.now()).slice(-5),total=rows.reduce((s,r)=>s+r.reportFreight,0);
- const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- const html=`<!doctype html><html><head><meta charset="utf-8"><title>Pending Freight Bill ${invoiceNo}</title><style>body{font-family:Arial;padding:28px;color:#222}h1{margin-bottom:4px}small{color:#555}.meta{display:flex;justify-content:space-between;margin:24px 0}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #bbb;padding:8px;text-align:left}th{background:#eee}.total{text-align:right;font-size:18px;font-weight:bold;margin-top:20px}.note{margin-top:36px;border-top:1px solid #aaa;padding-top:12px}@media print{button{display:none}}</style></head><body><h1>FREIGHT BILL / STATEMENT</h1><small>Fleet Dispatch Portal</small><div class="meta"><div><b>Bill To:</b><br>${esc(company)}</div><div><b>Bill No:</b> ${invoiceNo}<br><b>Date:</b> ${new Date().toISOString().slice(0,10)}<br><b>Period:</b> ${esc(from||"All dates")} to ${esc(to||"All dates")}</div></div><table><thead><tr><th>#</th><th>Type</th><th>Trip Date</th><th>Vehicle</th><th>Driver / Original Trip</th><th>Route</th><th>Payment Terms</th><th>Pending Freight (PKR)</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.recordType)}</td><td>${esc(r.reportDate)}</td><td>${esc(r.reportVehicle)}</td><td>${esc(r.reportDriver||"-")}</td><td>${esc(r.reportRoute)}</td><td>${esc(r.reportTerms)}</td><td>${r.reportFreight.toLocaleString("en-PK")}</td></tr>`).join("")}</tbody></table><div class="total">Total Outstanding: Rs. ${total.toLocaleString("en-PK")}</div><p>Please arrange payment of the outstanding freight shown above.</p><div class="note">Prepared by: ____________________ &nbsp;&nbsp; Received / Acknowledged by: ____________________</div><script>window.onload=()=>window.print()<\/script></body></html>`;
- const w=window.open("","_blank");if(!w){alert("Please allow pop-ups to print the freight bill.");return;}w.document.open();w.document.write(html);w.document.close();
-}
-async function markReceived(type,id){
- const isBack=type==="Back-load",list=isBack?backloads:data,r=list.find(x=>Number(x.id)===Number(id));if(!r)return;
+
+
+async function markReceived(id){
+ const r=data.find(x=>Number(x.id)===Number(id));
+ if(!r) return;
  const today=new Date().toISOString().slice(0,10);
- if(!confirm("Mark freight of "+money(r.total_freight)+" as RECEIVED today ("+today+")?"))return;
- try{const endpoint=(isBack?"/api/backloads/":"/api/dispatches/")+id;const payload={...r,payment_status:"Received",received_date:today};
-   await api(endpoint,{method:"PUT",body:JSON.stringify(payload)});await load();$("pc").value=r.company;showCompanyDetails(r.company,false);
- }catch(e){alert("Could not update payment. Please try again.");}
+ if(!confirm("Mark freight of "+money(r.total_freight)+" as RECEIVED today ("+today+")?")) return;
+ try{
+   const token=localStorage.getItem("fleetToken");
+   const res=await fetch("/api/dispatches/"+id,{
+     method:"PUT",
+     headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+     body:JSON.stringify({...r,payment_status:"Received",received_date:today})
+   });
+   const j=await res.json();
+   if(!res.ok) throw new Error(j.error||"Could not update payment");
+   await load();
+   pendingReport();
+   showCompanyDetails(r.company);
+ }catch(e){alert(e.message)}
 }
+
 
 function hideCompanyDetails(){
  $("companyDetailPanel").classList.add("hidden");
@@ -146,72 +148,26 @@ function hideCompanyDetails(){
 }
 
 function updateCompanyOptions(){
- let cur=$("pc").value, cs=[...new Set([...data,...backloads].map(r=>r.company).filter(Boolean))].sort();
+ let cur=$("pc").value, cs=[...new Set(data.map(r=>r.company).filter(Boolean))].sort();
  $("pc").innerHTML="<option value=''>All Companies</option>"+cs.map(c=>`<option>${c}</option>`).join("");
  if(cs.includes(cur))$("pc").value=cur;
 }
-function getVehicleReportRows(){
- const v=$("rv").value,from=$("rf").value,to=$("rt").value;
- return allTransactions().filter(r=>(!v||r.reportVehicle===v)&&(!from||r.reportDate>=from)&&(!to||r.reportDate<=to)).map(r=>{
-   let combined=r.reportFreight,linked="-";
-   if(r.recordType==="Outbound"){
-     const bs=backloads.filter(b=>Number(b.original_dispatch_id)===Number(r.id));
-     if(bs.length){combined=r.reportFreight+bs.reduce((s,b)=>s+Number(b.total_freight||0),0);linked=`${money(combined)} (${bs.length} back-load${bs.length===1?"":"s"})`;}
-   }else if(r.original_dispatch_id){
-     const d=data.find(x=>Number(x.id)===Number(r.original_dispatch_id));const bs=backloads.filter(b=>Number(b.original_dispatch_id)===Number(r.original_dispatch_id));combined=Number(d?.total_freight||0)+bs.reduce((s,b)=>s+Number(b.total_freight||0),0);linked=`Original trip #${r.original_dispatch_id}: ${money(combined)}`;
-   }
-   return {...r,combined,linked};
- }).sort((a,b)=>String(b.reportDate).localeCompare(String(a.reportDate))||String(a.reportVehicle).localeCompare(String(b.reportVehicle)));
-}
-function report(){
- const rows=getVehicleReportRows();
- $("rr1").textContent=rows.length;$("rr2").textContent=rows.reduce((a,r)=>a+r.reportWeight,0).toLocaleString("en-PK",{maximumFractionDigits:2})+" T";$("rr3").textContent=money(rows.reduce((a,r)=>a+r.reportFreight,0));$("rr4").textContent=money(rows.filter(r=>r.reportStatus!=="Received").reduce((a,r)=>a+r.reportFreight,0));$("rr5").textContent=money(rows.filter(r=>r.reportStatus==="Received").reduce((a,r)=>a+r.reportFreight,0));
- $("vehicleReportRows").innerHTML=rows.map(r=>`<tr><td>${r.recordType}</td><td>${r.reportDate}</td><td><b>${r.reportVehicle}</b></td><td>${r.reportCompany}</td><td>${r.reportRoute}</td><td>${money(r.reportFreight)}</td><td>${r.linked}</td><td><span class="badge ${r.reportStatus==="Received"?"r":"p"}">${r.reportStatus}</span></td><td>${r.received_date||"-"}</td></tr>`).join("")||"<tr><td colspan=9>No vehicle transactions match these filters.</td></tr>";
-}
-function exportVehicleReportCSV(){const rows=getVehicleReportRows(),heads=["Type","Date","Vehicle","Company","Route","Freight","Linked Combined Potential","Payment Status","Received Date"];const lines=[heads,...rows.map(r=>[r.recordType,r.reportDate,r.reportVehicle,r.reportCompany,r.reportRoute,r.reportFreight,r.linked,r.reportStatus,r.received_date||""])].map(r=>r.map(csvCell).join(",")).join("\r\n");const blob=new Blob(["\ufeff"+lines],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`vehicle-trip-report-${$("rv").value||"all"}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function printVehicleReport(){const rows=getVehicleReportRows(),html=`<!doctype html><html><head><meta charset="utf-8"><title>Vehicle Trip Report</title><style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%;font-size:10px}th,td{border:1px solid #bbb;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>Vehicle-wise Trip Report</h1><p>Vehicle: ${$("rv").value||"All vehicles"} | From: ${$("rf").value||"All dates"} | To: ${$("rt").value||"All dates"}</p><p>Total freight: ${money(rows.reduce((s,r)=>s+r.reportFreight,0))} | Received: ${money(rows.filter(r=>r.reportStatus==="Received").reduce((s,r)=>s+r.reportFreight,0))} | Pending: ${money(rows.filter(r=>r.reportStatus!=="Received").reduce((s,r)=>s+r.reportFreight,0))}</p><table><thead><tr><th>Type</th><th>Date</th><th>Vehicle</th><th>Company</th><th>Route</th><th>Freight</th><th>Combined Potential</th><th>Status</th><th>Received Date</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.recordType}</td><td>${r.reportDate}</td><td>${r.reportVehicle}</td><td>${r.reportCompany}</td><td>${r.reportRoute}</td><td>${money(r.reportFreight)}</td><td>${r.linked}</td><td>${r.reportStatus}</td><td>${r.received_date||"-"}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;const w=window.open("","_blank");if(!w){alert("Please allow pop-ups to print or save PDF.");return;}w.document.open();w.document.write(html);w.document.close();}
+async function report(){let v=$("rv").value,from=$("rf").value,to=$("rt").value;if(!v){let d=data.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to));$("rr1").textContent=d.length;$("rr2").textContent=d.reduce((a,r)=>a+r.weight,0)+" T";$("rr3").textContent=money(d.reduce((a,r)=>a+r.total_freight,0));$("rr4").textContent=money(d.filter(r=>r.payment_status!=="Received").reduce((a,r)=>a+r.total_freight,0));return}let x=await api("/api/vehicles/"+encodeURIComponent(v)+"/report?from="+from+"&to="+to);$("rr1").textContent=x.summary.trips;$("rr2").textContent=x.summary.totalWeight+" T";$("rr3").textContent=money(x.summary.freight);$("rr4").textContent=money(x.summary.pending)}
 function calcBack(){let w=+$("bWeight").value||0,c=+$("bCapacity").value||0,r=+$("bRate").value||0,base=+$("bBase").value||0,e=Math.max(0,w-c);$("bExtra").textContent=e+" T";$("bExtraFreight").textContent=money(e*r);$("bTotal").textContent=money(base+e*r)}
 ["bWeight","bCapacity","bRate","bBase"].forEach(x=>$(x).addEventListener("input",calcBack));
-function resetBackForm(){$("backForm").reset();$("bid").value="";$("bDate").value=new Date().toISOString().slice(0,10);$("bDestination").value="Karachi";$("bCapacity").value="40";$("bOriginal").value="";$("bCompleted").value="0";$("bCompletionDate").value="";calcBack()}
-function editBack(b){$("bid").value=b.id;$("bOriginal").value=b.original_dispatch_id||"";$("bDate").value=b.date;$("bVehicle").value=b.vehicle;$("bOrigin").value=b.origin;$("bDestination").value=b.destination;$("bWeight").value=b.weight;$("bCapacity").value=b.capacity||40;$("bCompany").value=b.company;$("bBase").value=b.base_freight;$("bRate").value=b.extra_rate;$("bTerms").value=b.payment_terms;$("bStatus").value=b.payment_status;$("bReceived").value=b.received_date||"";$("bCompleted").value=String(b.completed?1:0);$("bCompletionDate").value=b.completion_date||"";$("bRemarks").value=b.remarks||"";calcBack();$("backForm").scrollIntoView({behavior:"smooth"})}
+function resetBackForm(){$("backForm").reset();$("bid").value="";$("bDate").value=new Date().toISOString().slice(0,10);$("bDestination").value="Karachi";$("bCapacity").value="40";$("bOriginal").value="";calcBack()}
+function editBack(b){$("bid").value=b.id;$("bOriginal").value=b.original_dispatch_id||"";$("bDate").value=b.date;$("bVehicle").value=b.vehicle;$("bOrigin").value=b.origin;$("bDestination").value=b.destination;$("bWeight").value=b.weight;$("bCapacity").value=b.capacity||40;$("bCompany").value=b.company;$("bBase").value=b.base_freight;$("bRate").value=b.extra_rate;$("bTerms").value=b.payment_terms;$("bStatus").value=b.payment_status;$("bReceived").value=b.received_date||"";$("bRemarks").value=b.remarks||"";calcBack();$("backForm").scrollIntoView({behavior:"smooth"})}
 async function delBack(id){if(confirm("Delete this back-load record?")){await api("/api/backloads/"+id,{method:"DELETE"});load()}}
-$("backForm").onsubmit=async e=>{e.preventDefault();if($("bCompleted").value==="1"&&!$("bCompletionDate").value){alert("Please enter the completion date for a completed back-load.");return;}let orig=$("bOriginal").value;let d={original_dispatch_id:orig?+orig:null,date:$("bDate").value,vehicle:$("bVehicle").value.toUpperCase(),origin:$("bOrigin").value,destination:$("bDestination").value,weight:+$("bWeight").value,capacity:+$("bCapacity").value,company:$("bCompany").value,base_freight:+$("bBase").value,extra_rate:+$("bRate").value,payment_terms:$("bTerms").value,payment_status:$("bStatus").value,received_date:$("bReceived").value,completed:$("bCompleted").value==="1",completion_date:$("bCompletionDate").value,remarks:$("bRemarks").value};let id=$("bid").value;await api(id?"/api/backloads/"+id:"/api/backloads",{method:id?"PUT":"POST",body:JSON.stringify(d)});resetBackForm();load()};
-function renderBackloads(){$("backRows").innerHTML=backloads.map(b=>`<tr><td>${b.date}</td><td>${b.original_dispatch_id||"-"} ${b.original_date?"("+b.original_date+")":""}</td><td><b>${b.vehicle}</b></td><td>${b.origin} → ${b.destination}</td><td>${b.weight} T${b.extra_weight>0?"<br><span class='badge p'>+"+b.extra_weight+" T</span>":""}</td><td>${b.company}</td><td>${money(b.base_freight)}</td><td>${money(b.extra_freight)}</td><td><b>${money(b.total_freight)}</b></td><td><span class="badge ${b.payment_status==="Received"?"r":"p"}">${b.payment_status}</span><br><span class=muted>${b.payment_terms}</span></td><td><span class="badge ${b.completed?"r":"p"}">${b.completed?"Completed":"Not Completed"}</span><br><span class=muted>${b.completion_date||"No completion date"}</span></td><td><button onclick='editBack(${JSON.stringify(b)})'>Edit</button> <button class=danger onclick='delBack(${b.id})'>Delete</button></td></tr>`).join("")||"<tr><td colspan=12>No back-load records.</td></tr>";let cur=$("bOriginal").value;$("bOriginal").innerHTML="<option value=''>No linked outbound trip</option>"+data.map(d=>`<option value="${d.id}">#${d.id} — ${d.vehicle} — ${d.origin} to ${d.destination} (${d.date})</option>`).join("");$("bOriginal").value=cur}
+$("backForm").onsubmit=async e=>{e.preventDefault();let orig=$("bOriginal").value;let d={original_dispatch_id:orig?+orig:null,date:$("bDate").value,vehicle:$("bVehicle").value.toUpperCase(),origin:$("bOrigin").value,destination:$("bDestination").value,weight:+$("bWeight").value,capacity:+$("bCapacity").value,company:$("bCompany").value,base_freight:+$("bBase").value,extra_rate:+$("bRate").value,payment_terms:$("bTerms").value,payment_status:$("bStatus").value,received_date:$("bReceived").value,remarks:$("bRemarks").value};let id=$("bid").value;await api(id?"/api/backloads/"+id:"/api/backloads",{method:id?"PUT":"POST",body:JSON.stringify(d)});resetBackForm();load()};
+function renderBackloads(){$("backRows").innerHTML=backloads.map((b,i)=>`<tr><td>${i+1}</td><td>${b.date}</td><td>${b.original_dispatch_id||"-"} ${b.original_date?"("+b.original_date+")":""}</td><td><b>${b.vehicle}</b></td><td>${b.origin} → ${b.destination}</td><td>${b.weight} T${b.extra_weight>0?"<br><span class='badge p'>+"+b.extra_weight+" T</span>":""}</td><td>${b.company}</td><td>${money(b.base_freight)}</td><td>${money(b.extra_freight)}</td><td><b>${money(b.total_freight)}</b></td><td><span class="badge ${b.payment_status==="Received"?"r":"p"}">${b.payment_status}</span><br><span class=muted>${b.payment_terms}</span></td><td><button onclick='editBack(${JSON.stringify(b)})'>Edit</button> <button class=danger onclick='delBack(${b.id})'>Delete</button></td></tr>`).join("")||"<tr><td colspan=12>No back-load records.</td></tr>";let cur=$("bOriginal").value;$("bOriginal").innerHTML="<option value=''>No linked outbound trip</option>"+data.map(d=>`<option value="${d.id}">#${d.id} — ${d.vehicle} — ${d.origin} to ${d.destination} (${d.date})</option>`).join("");$("bOriginal").value=cur}
 function dashboard(){let today=new Date().toISOString().slice(0,10),tdb=backloads.filter(b=>b.date===today),outTotal=data.reduce((s,r)=>s+Number(r.total_freight||0),0),backTotal=backloads.reduce((s,r)=>s+Number(r.total_freight||0),0),all=[...data,...backloads],pending=all.filter(r=>r.payment_status!=="Received").reduce((s,r)=>s+Number(r.total_freight||0),0),received=all.filter(r=>r.payment_status==="Received").reduce((s,r)=>s+Number(r.total_freight||0),0);$("dbTodayBack").textContent=tdb.length;$("dbOut").textContent=money(outTotal);$("dbBack").textContent=money(backTotal);$("dbCombined").textContent=money(outTotal+backTotal);$("dbPending").textContent=money(pending);$("dbReceived").textContent=money(received);$("dbVehicles").textContent=new Set(all.map(r=>r.vehicle)).size;$("dbBackPending").textContent=money(backloads.filter(r=>r.payment_status!=="Received").reduce((s,r)=>s+Number(r.total_freight||0),0))}
-function tripIncomeCycles(){
- const cycles=[],linkedIds=new Set();
- const backsByOriginal={};backloads.filter(b=>b.original_dispatch_id).forEach(b=>{(backsByOriginal[b.original_dispatch_id] ||= []).push(b)});
- data.forEach(d=>{
-   const backs=backsByOriginal[d.id]||[];if(!backs.length){cycles.push({vehicle:d.vehicle,month:(d.date||"").slice(0,7),recognitionDate:d.date,kind:"Outbound only",outbound:Number(d.total_freight||0),backload:0,potential:Number(d.total_freight||0),income:Number(d.total_freight||0),completed:true,status:"Outbound only",details:`Trip #${d.id} — ${d.origin} → ${d.destination}`,company:d.company});return;}
-   backs.forEach(b=>linkedIds.add(b.id));
-   const allDone=backs.every(b=>Number(b.completed)===1);
-   const dates=backs.map(b=>b.completion_date||b.date).filter(Boolean).sort();const recDate=dates.length?dates[dates.length-1]:d.date;
-   const backTotal=backs.reduce((s,b)=>s+Number(b.total_freight||0),0),outTotal=Number(d.total_freight||0),potential=outTotal+backTotal;
-   cycles.push({vehicle:d.vehicle||backs[0].vehicle,month:String(recDate||"").slice(0,7),recognitionDate:recDate,kind:"Outbound + Back-load",outbound:outTotal,backload:backTotal,potential,income:allDone?potential:0,completed:allDone,status:allDone?"Completed — income counted":"Waiting for back-load completion",details:`Trip #${d.id}: ${d.origin} → ${d.destination} + ${backs.map(b=>`${b.origin} → ${b.destination}`).join("; ")}`,company:d.company});
- });
- backloads.filter(b=>!b.original_dispatch_id).forEach(b=>{const done=Number(b.completed)===1,dt=b.completion_date||b.date;cycles.push({vehicle:b.vehicle,month:String(dt||"").slice(0,7),recognitionDate:dt,kind:"Unlinked back-load",outbound:0,backload:Number(b.total_freight||0),potential:Number(b.total_freight||0),income:done?Number(b.total_freight||0):0,completed:done,status:done?"Completed — income counted":"Waiting for back-load completion",details:`Back-load #${b.id}: ${b.origin} → ${b.destination}`,company:b.company});});
- return cycles;
-}
-function renderMonthlyIncome(){
- const month=$("incomeMonth").value,vehicle=$("incomeVehicle").value;
- const all=tripIncomeCycles().filter(c=>(!month||c.month===month)&&(!vehicle||c.vehicle===vehicle));
- const grouped={};all.forEach(c=>{const v=c.vehicle||"(Unknown vehicle)";if(!grouped[v])grouped[v]={cycles:0,completed:0,income:0,potential:0};const g=grouped[v];g.cycles++;if(c.completed)g.completed++;g.income+=c.income; if(!c.completed)g.potential+=c.potential;});
- const rows=Object.entries(grouped).map(([vehicle,g])=>({vehicle,...g})).sort((a,b)=>a.vehicle.localeCompare(b.vehicle));
- $("miVehicles").textContent=rows.length;$("miCycles").textContent=all.filter(c=>c.completed).length;$("miIncome").textContent=money(all.reduce((s,c)=>s+c.income,0));$("miPotential").textContent=money(all.filter(c=>!c.completed).reduce((s,c)=>s+c.potential,0));
- $("monthlyIncomeRows").innerHTML=rows.map(r=>`<tr><td><b>${r.vehicle}</b></td><td>${r.cycles}</td><td>${r.completed}</td><td><b>${money(r.income)}</b></td><td>${money(r.potential)}</td></tr>`).join("")||"<tr><td colspan=5>No income cycles for this month/filter.</td></tr>";
- $("monthlyIncomeDetails").innerHTML=all.sort((a,b)=>String(a.recognitionDate).localeCompare(String(b.recognitionDate))).map(c=>`<tr><td>${c.details}</td><td>${c.recognitionDate||"-"}</td><td>${c.vehicle}</td><td>${money(c.outbound)}</td><td>${money(c.backload)}</td><td>${money(c.potential)}</td><td><span class="badge ${c.completed?"r":"p"}">${c.status}</span></td><td><b>${money(c.income)}</b></td></tr>`).join("")||"<tr><td colspan=8>No cycles match this month.</td></tr>";
-}
-function exportMonthlyIncomeCSV(){const month=$("incomeMonth").value||"all-months",all=tripIncomeCycles().filter(c=>(!$("incomeMonth").value||c.month===$("incomeMonth").value)&&(!$("incomeVehicle").value||c.vehicle===$("incomeVehicle").value));const heads=["Month","Recognition Date","Vehicle","Cycle","Outbound Freight","Back-load Freight","Potential Combined Freight","Completed","Income Counted","Status","Details"];const lines=[heads,...all.map(c=>[c.month,c.recognitionDate,c.vehicle,c.kind,c.outbound,c.backload,c.potential,c.completed?"Yes":"No",c.income,c.status,c.details])].map(r=>r.map(csvCell).join(",")).join("\r\n");const blob=new Blob(["\ufeff"+lines],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`vehicle-monthly-income-${month}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function printMonthlyIncome(){const month=$("incomeMonth").value||"All months",all=tripIncomeCycles().filter(c=>(!$("incomeMonth").value||c.month===$("incomeMonth").value)&&(!$("incomeVehicle").value||c.vehicle===$("incomeVehicle").value));const html=`<!doctype html><html><head><meta charset="utf-8"><title>Monthly Vehicle Income</title><style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%;font-size:11px}th,td{border:1px solid #bbb;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>Monthly Vehicle Income Report</h1><p>Month: ${month} | Recognized income assumes original outbound freight will be received once the linked back-load cycle is completed.</p><p><b>Income counted: ${money(all.reduce((s,c)=>s+c.income,0))}</b> | Potential not yet recognized: ${money(all.filter(c=>!c.completed).reduce((s,c)=>s+c.potential,0))}</p><table><thead><tr><th>Date</th><th>Vehicle</th><th>Cycle</th><th>Outbound Freight</th><th>Back-load Freight</th><th>Potential</th><th>Status</th><th>Income Counted</th></tr></thead><tbody>${all.map(c=>`<tr><td>${c.recognitionDate||"-"}</td><td>${c.vehicle}</td><td>${c.details}</td><td>${money(c.outbound)}</td><td>${money(c.backload)}</td><td>${money(c.potential)}</td><td>${c.status}</td><td>${money(c.income)}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;const w=window.open("","_blank");if(!w){alert("Please allow pop-ups to print or save PDF.");return;}w.document.open();w.document.write(html);w.document.close();}
-function updateIncomeVehicleOptions(){const cur=$("incomeVehicle").value,vs=[...new Set([...data,...backloads].map(r=>r.vehicle).filter(Boolean))].sort();$("incomeVehicle").innerHTML="<option value=''>All Vehicles</option>"+vs.map(v=>`<option>${v}</option>`).join("");if(vs.includes(cur))$("incomeVehicle").value=cur;}
-
 function getFilteredReportRows(){
  const from=$("repFrom").value,to=$("repTo").value,type=$("repType").value,q=$("repSearch").value.trim().toLowerCase();
  let out=[];
- if(type!=="backload") out.push(...data.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)).map(r=>({type:"Outbound",date:r.date,vehicle:r.vehicle,driverTrip:(backloads.some(b=>Number(b.original_dispatch_id)===Number(r.id))?`${r.driver} (linked back-load)` : r.driver),route:`${r.origin} → ${r.destination}`,weight:Number(r.weight||0),company:r.company,freight:Number(r.total_freight||0),status:r.payment_status,received:r.received_date||"",id:r.id})));
- if(type!=="outbound") out.push(...backloads.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)).map(r=>({type:"Back-load",date:r.date,vehicle:r.vehicle,driverTrip:r.original_dispatch_id?`Original trip #${r.original_dispatch_id} — combined cycle potential ${money(Number((data.find(d=>Number(d.id)===Number(r.original_dispatch_id))||{}).total_freight||0)+Number(r.total_freight||0))}`:"Unlinked back-load",route:`${r.origin} → ${r.destination}`,weight:Number(r.weight||0),company:r.company,freight:Number(r.total_freight||0),status:r.payment_status,received:r.received_date||"",id:r.id})));
+ if(type!=="backload") out.push(...data.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)).map(r=>({type:"Outbound",date:r.date,vehicle:r.vehicle,driverTrip:r.driver,route:`${r.origin} → ${r.destination}`,weight:Number(r.weight||0),company:r.company,freight:Number(r.total_freight||0),status:r.payment_status,received:r.received_date||"",id:r.id})));
+ if(type!=="outbound") out.push(...backloads.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)).map(r=>({type:"Back-load",date:r.date,vehicle:r.vehicle,driverTrip:r.original_dispatch_id?`Original trip #${r.original_dispatch_id}`:"-",route:`${r.origin} → ${r.destination}`,weight:Number(r.weight||0),company:r.company,freight:Number(r.total_freight||0),status:r.payment_status,received:r.received_date||"",id:r.id})));
  if(q) out=out.filter(r=>[r.type,r.date,r.vehicle,r.driverTrip,r.route,r.company,r.status].join(" ").toLowerCase().includes(q));
- return out.sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(a.vehicle).localeCompare(String(b.vehicle)));
+ return out.sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.vehicle).localeCompare(String(b.vehicle))||String(a.type).localeCompare(String(b.type)));
 }
 function renderReport(){
  const rows=getFilteredReportRows();
@@ -219,30 +175,27 @@ function renderReport(){
  $("repWeight").textContent=rows.reduce((s,r)=>s+r.weight,0).toLocaleString("en-PK",{maximumFractionDigits:2})+" T";
  $("repFreight").textContent=money(rows.reduce((s,r)=>s+r.freight,0));
  $("repPending").textContent=money(rows.filter(r=>r.status!=="Received").reduce((s,r)=>s+r.freight,0));
- $("reportRows").innerHTML=rows.map(r=>`<tr><td>${r.type}</td><td>${r.date}</td><td><b>${r.vehicle}</b></td><td>${r.driverTrip}</td><td>${r.route}</td><td>${r.weight} T</td><td>${r.company}</td><td>${money(r.freight)}</td><td><span class="badge ${r.status==="Received"?"r":"p"}">${r.status||"Pending"}</span></td><td>${r.received||"-"}</td></tr>`).join("")||"<tr><td colspan=10 style='text-align:center;padding:22px'>No records match the selected filters.</td></tr>";
+ $("reportRows").innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.type}</td><td>${r.date}</td><td><b>${r.vehicle}</b></td><td>${r.driverTrip}</td><td>${r.route}</td><td>${r.weight} T</td><td>${r.company}</td><td>${money(r.freight)}</td><td><span class="badge ${r.status==="Received"?"r":"p"}">${r.status||"Pending"}</span></td><td>${r.received||"-"}</td></tr>`).join("")||"<tr><td colspan=11 style='text-align:center;padding:22px'>No records match the selected filters.</td></tr>";
 }
 function csvCell(v){const x=String(v??"");return '"'+x.replace(/"/g,'""')+'"'}
 function exportReportCSV(){
  const rows=getFilteredReportRows();
- const headers=["Type","Date","Vehicle","Driver / Original Trip","Route","Weight (Tons)","Company","Freight (PKR)","Payment Status","Received Date"];
- const lines=[headers,...rows.map(r=>[r.type,r.date,r.vehicle,r.driverTrip,r.route,r.weight,r.company,r.freight,r.status,r.received])].map(row=>row.map(csvCell).join(",")).join("\r\n");
+ const headers=["S.No.","Type","Date","Vehicle","Driver / Original Trip","Route","Weight (Tons)","Company","Freight (PKR)","Payment Status","Received Date"];
+ const lines=[headers,...rows.map((r,i)=>[i+1,r.type,r.date,r.vehicle,r.driverTrip,r.route,r.weight,r.company,r.freight,r.status,r.received])].map(row=>row.map(csvCell).join(",")).join("\r\n");
  const blob=new Blob(["\ufeff"+lines],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
  a.href=url;a.download=`fleet-dispatch-report-${$("repFrom").value||"all"}-to-${$("repTo").value||"all"}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
 function printReport(){
  const rows=getFilteredReportRows();
  const from=$("repFrom").value||"All dates",to=$("repTo").value||"All dates",type=$("repType").selectedOptions[0].textContent;
- const html=`<!doctype html><html><head><meta charset="utf-8"><title>Fleet Dispatch Report</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222}h1{font-size:22px}p{font-size:12px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #bbb;padding:6px;text-align:left}th{background:#eee}.summary{margin:14px 0;font-weight:bold}@media print{button{display:none}}</style></head><body><h1>Fleet Dispatch Report</h1><p>Period: ${from} to ${to} | Type: ${type}</p><div class="summary">Records: ${rows.length} | Weight: ${rows.reduce((s,r)=>s+r.weight,0).toLocaleString("en-PK",{maximumFractionDigits:2})} T | Total Freight: ${money(rows.reduce((s,r)=>s+r.freight,0))} | Pending: ${money(rows.filter(r=>r.status!=="Received").reduce((s,r)=>s+r.freight,0))}</div><table><thead><tr><th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Trip</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Status</th><th>Received Date</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.type}</td><td>${r.date}</td><td>${r.vehicle}</td><td>${r.driverTrip}</td><td>${r.route}</td><td>${r.weight} T</td><td>${r.company}</td><td>${money(r.freight)}</td><td>${r.status}</td><td>${r.received||"-"}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;
+ const html=`<!doctype html><html><head><meta charset="utf-8"><title>Fleet Dispatch Report</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222}h1{font-size:22px}p{font-size:12px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #bbb;padding:6px;text-align:left}th{background:#eee}.summary{margin:14px 0;font-weight:bold}@media print{button{display:none}}</style></head><body><h1>Fleet Dispatch Report</h1><p>Period: ${from} to ${to} | Type: ${type}</p><div class="summary">Records: ${rows.length} | Weight: ${rows.reduce((s,r)=>s+r.weight,0).toLocaleString("en-PK",{maximumFractionDigits:2})} T | Total Freight: ${money(rows.reduce((s,r)=>s+r.freight,0))} | Pending: ${money(rows.filter(r=>r.status!=="Received").reduce((s,r)=>s+r.freight,0))}</div><table><thead><tr><th>S.No.</th><th>S.No.</th><th>Type</th><th>Date</th><th>Vehicle</th><th>Driver / Trip</th><th>Route</th><th>Weight</th><th>Company</th><th>Freight</th><th>Status</th><th>Received Date</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.type}</td><td>${r.date}</td><td>${r.vehicle}</td><td>${r.driverTrip}</td><td>${r.route}</td><td>${r.weight} T</td><td>${r.company}</td><td>${money(r.freight)}</td><td>${r.status}</td><td>${r.received||"-"}</td></tr>`).join("")}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;
  const w=window.open("","_blank");if(!w){alert("Please allow pop-ups for this portal to print or save as PDF.");return}w.document.open();w.document.write(html);w.document.close();
 }
 function clearReportFilters(){$("repFrom").value="";$("repTo").value="";$ ("repType").value="all";$ ("repSearch").value="";renderReport()}
 ["repFrom","repTo","repType","repSearch"].forEach(id=>$(id).addEventListener("input",renderReport));
 
-async function load(){data=await api("/api/dispatches");backloads=await api("/api/backloads");updateCompanyOptions();updateIncomeVehicleOptions();render();renderBackloads();dashboard();report();pendingReport();renderReport();renderMonthlyIncome()}
+async function load(){data=await api("/api/dispatches");backloads=await api("/api/backloads");updateCompanyOptions();render();renderBackloads();dashboard();report();pendingReport();renderReport()}
 $("search").oninput=render;["rv","rf","rt"].forEach(x=>$(x).oninput=report);
 ["pc","pf","pt"].forEach(x=>$(x).oninput=pendingReport);
 if(token)show();else {calc();calcBack()}
-$("incomeMonth").value=new Date().toISOString().slice(0,7);
-["incomeMonth","incomeVehicle"].forEach(id=>$(id).addEventListener("input",renderMonthlyIncome));
-$("bCompleted").addEventListener("change",()=>{if($("bCompleted").value==="1"&&!$("bCompletionDate").value)$("bCompletionDate").value=new Date().toISOString().slice(0,10)});
 </script></body></html>
