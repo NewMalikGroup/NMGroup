@@ -7,7 +7,9 @@ const jwt=require("jsonwebtoken");
 const app=express();
 const PORT=process.env.PORT||3000;
 const SECRET=process.env.JWT_SECRET||"CHANGE_THIS_SECRET_IN_PRODUCTION";
-const db=new Database(process.env.DB_PATH||"fleet.db");
+// Render free filesystem is ephemeral. Set DB_PATH to a persistent mounted disk
+// when available (for example /var/data/fleet.db on a paid Render disk).
+const db=new Database(process.env.DB_PATH||path.join(__dirname,"fleet.db"));
 db.pragma("journal_mode = WAL");
 
 db.exec(`
@@ -99,7 +101,7 @@ app.post("/api/login",(req,res)=>{
 });
 
 app.get("/api/dispatches",auth,(req,res)=>{
-  const rows=db.prepare("SELECT * FROM dispatches ORDER BY date DESC,id DESC").all();
+  const rows=db.prepare("SELECT * FROM dispatches ORDER BY date ASC,id ASC").all();
   res.json(rows);
 });
 
@@ -124,7 +126,7 @@ app.delete("/api/dispatches/:id",auth,(req,res)=>{
 });
 
 app.get("/api/backloads",auth,(req,res)=>{
- res.json(db.prepare("SELECT b.*,d.date AS original_date FROM backloads b LEFT JOIN dispatches d ON d.id=b.original_dispatch_id ORDER BY b.date DESC,b.id DESC").all());
+ res.json(db.prepare("SELECT b.*,d.date AS original_date FROM backloads b LEFT JOIN dispatches d ON d.id=b.original_dispatch_id ORDER BY b.date ASC,b.id ASC").all());
 });
 app.post("/api/backloads",auth,(req,res)=>{
  const d=req.body, extra=Math.max(0,Number(d.weight||0)-Number(d.capacity||0));
